@@ -42,6 +42,7 @@ variable "image_name" {
 source "qemu" "rhel" {
   vm_name          = var.image_name
   output_directory = var.output_dir
+  qemu_binary      = "/usr/libexec/qemu-kvm"
 
   iso_url      = var.kernel_url
   iso_checksum = "none"
