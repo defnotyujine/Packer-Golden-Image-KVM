@@ -47,7 +47,7 @@ source "qemu" "rhel" {
     ["-serial", "stdio"]
   ]
 
-  disk_size      = "20G"
+  disk_size      = "100G"
   disk_interface = "virtio"
   format         = "qcow2"
 
