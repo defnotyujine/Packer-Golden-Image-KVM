@@ -7,14 +7,6 @@ packer {
   }
 }
 
-variable "kernel_url" {
-  type = string
-}
-
-variable "initrd_url" {
-  type = string
-}
-
 variable "kernel_params" {
   type = string
 }
@@ -44,12 +36,12 @@ source "qemu" "rhel" {
   output_directory = var.output_dir
   qemu_binary      = "/usr/libexec/qemu-kvm"
 
-  iso_url      = var.kernel_url
+  iso_url      = "file:///tmp/vmlinuz"
   iso_checksum = "none"
 
   qemuargs = [
-    ["-kernel", var.kernel_url],
-    ["-initrd", var.initrd_url],
+    ["-kernel", "/tmp/vmlinuz"],
+    ["-initrd", "/tmp/initrd.img"],
     ["-append", "${var.kernel_params} console=ttyS0"],
     ["-serial", "stdio"]
   ]
