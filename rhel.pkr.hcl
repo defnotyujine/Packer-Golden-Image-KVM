@@ -40,6 +40,7 @@ source "qemu" "rhel" {
   iso_checksum = "none"
 
   qemuargs = [
+    ["-cpu", "host"],
     ["-kernel", "/tmp/vmlinuz"],
     ["-initrd", "/tmp/initrd.img"],
     ["-append", "${var.kernel_params} console=ttyS0"],
