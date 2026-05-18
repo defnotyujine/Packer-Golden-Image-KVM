@@ -31,7 +31,7 @@ variable "ssh_password" {
 
 variable "output_dir" {
   type    = string
-  default = "/var/lib/libvirt/images"
+  default = "/var/lib/libvirt/packer-output"
 }
 
 variable "image_name" {
