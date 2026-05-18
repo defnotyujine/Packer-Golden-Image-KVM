@@ -44,7 +44,7 @@ source "qemu" "rhel" {
   output_directory = var.output_dir
   qemu_binary      = "/usr/libexec/qemu-kvm"
 
-  remote_host      = 192.168.122.1
+  remote_host      = "192.168.122.1"
   remote_username  = "frqadmin"
   remote_password  = var.ssh_password
   remote_path      = "/var/tmp/packer" 
