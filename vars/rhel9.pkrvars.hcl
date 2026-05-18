@@ -1,0 +1,1 @@
+image_name = "rhel9-golden.qcow2"
