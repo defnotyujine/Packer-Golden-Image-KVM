@@ -31,7 +31,7 @@ variable "ssh_password" {
 
 variable "output_dir" {
   type    = string
-  default = "/var/lib/libvirt/images"
+  default = "/var/lib/jenkins/packer-output"
 }
 
 variable "image_name" {
@@ -43,11 +43,6 @@ source "qemu" "rhel" {
   vm_name          = var.image_name
   output_directory = var.output_dir
   qemu_binary      = "/usr/libexec/qemu-kvm"
-
-  remote_host      = "192.168.122.1"
-  remote_username  = "frqadmin"
-  remote_password  = var.ssh_password
-  remote_path      = "/var/tmp/packer" 
 
   iso_url      = var.kernel_url
   iso_checksum = "none"
