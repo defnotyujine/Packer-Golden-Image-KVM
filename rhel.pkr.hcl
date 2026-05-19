@@ -44,8 +44,8 @@ source "qemu" "rhel" {
     ["-kernel", "/tmp/vmlinuz"],
     ["-initrd", "/tmp/initrd.img"],
     ["-append", "${var.kernel_params} console=ttyS0 inst.reboot=0"],
-    ["-serial", "stdio"]
-    ["-boot", "once=n"
+    ["-serial", "stdio"],
+    ["-boot", "once=n"]
   ]
 
   disk_size      = "100G"
