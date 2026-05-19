@@ -45,6 +45,7 @@ source "qemu" "rhel" {
     ["-initrd", "/tmp/initrd.img"],
     ["-append", "${var.kernel_params} console=ttyS0 inst.reboot=0"],
     ["-serial", "stdio"]
+    ["-device", "virtio-blk-pci,drive=drive0,bootindex=1"]  
   ]
 
   disk_size      = "100G"
