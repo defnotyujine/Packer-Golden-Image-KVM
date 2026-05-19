@@ -48,7 +48,7 @@ source "qemu" "rhel" {
     ["-serial", "stdio"],
     # THE FIX: Tell QEMU to use direct kernel boot ONLY ONCE. 
     # On the warm reboot triggered by Kickstart, it drops back to the hard drive ('c').
-    ["-boot", "once=c,menu=off"]
+    ["-boot", "order=c,menu=off"]
   ]
 
   disk_size      = "100G"
