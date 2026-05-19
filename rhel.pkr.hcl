@@ -98,6 +98,7 @@ build {
 
   provisioner "ansible" {
     playbook_file = "${var.ansible_dir}/playbooks/main_playbook.yml"
+    sftp_command  = "/usr/libexec/openssh/sftp-server -e"
 
     extra_arguments = concat(
       [
