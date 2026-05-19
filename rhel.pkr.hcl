@@ -99,6 +99,7 @@ build {
   provisioner "ansible" {
     playbook_file = "${var.ansible_dir}/playbooks/main_playbook.yml"
     sftp_command  = "/usr/libexec/openssh/sftp-server -e"
+    user          = var.ssh_username
 
     extra_arguments = concat(
       [
@@ -111,7 +112,8 @@ build {
     ansible_env_vars = [
       "ANSIBLE_ROLES_PATH=${var.ansible_dir}/playbooks/roles",
       "ANSIBLE_SCP_IF_SSH=True",
-      "ANSIBLE_SSH_TRANSFER_METHOD=scp"
+      "ANSIBLE_SSH_TRANSFER_METHOD=scp",
+      "ANSIBLE_REMOTE_TMP=/tmp/.ansible/tmp"
     ]
   }
 
