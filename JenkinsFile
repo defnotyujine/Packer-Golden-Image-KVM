@@ -1,0 +1,102 @@
+pipeline {
+    agent any
+    parameters {
+        string(name: 'META_URL', defaultValue: '', description: 'URL to meta JSON')
+        string(name: 'IMAGE_NAME', defaultValue: 'rhel-golden.qcow2', description: 'Output qcow2 filename')
+    }
+
+    stages {
+        stage('Validate Parameters') {
+            steps {
+                script {
+                    if (!params.META_URL?.trim()) {
+                        error('META_URL is required.')
+                    }
+                }
+            }
+        }
+
+        stage('Checkout Packer Repo') {
+            steps {
+                dir('packer') {
+                    git branch: 'devel',
+                        url: 'https://github.com/defnotyujine/Packer-Golden-Image-KVM.git'
+                }
+            }
+        }
+
+        stage('Fetch Meta') {
+            steps {
+                script {
+                    def meta = sh(
+                        script: "curl -sf '${params.META_URL}'",
+                        returnStdout: true
+                    ).trim()
+
+                    def parsed = readJSON text: meta
+
+                    env.KERNEL_URL = parsed.kernelLocation
+                    env.INITRD_URL = parsed.initrdLocation
+
+                    def kp = (parsed.kernelParameters ?: '').trim()
+                    if (!kp.contains('inst.kexec'))    { kp = kp + ' inst.kexec' }
+                    if (!kp.contains('inst.reboot=0')) { kp = kp + ' inst.reboot=0' }
+                    env.KERNEL_PARAMS = kp.trim()
+
+                    echo "Kernel: ${env.KERNEL_URL}"
+                    echo "Initrd: ${env.INITRD_URL}"
+                    echo "Params: ${env.KERNEL_PARAMS}"
+                }
+            }
+        }
+
+        stage('Packer Init') {
+            steps {
+                sh 'cd packer && packer init .'
+            }
+        }
+
+        stage('Packer Build') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'packer-ssh-password', variable: 'SSH_PASS')
+                ]) {
+                    withEnv([
+                        "PKR_VAR_kernel_url=${env.KERNEL_URL}",
+                        "PKR_VAR_initrd_url=${env.INITRD_URL}",
+                        "PKR_VAR_kernel_params=${env.KERNEL_PARAMS}",
+                        "PKR_VAR_ssh_password=${env.SSH_PASS}",
+                        "PKR_VAR_image_name=${params.IMAGE_NAME}"
+                    ]) {
+                        sh '''
+                            cd packer
+                            PACKER_LOG=1 packer build -force rhel.pkr.hcl
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Upload Image to KVM Host') {
+            steps {
+                sh """
+                    scp -o StrictHostKeyChecking=no \
+                        /var/lib/jenkins/packer-output/${params.IMAGE_NAME} \
+                        frqadmin@192.168.122.1:/tmp/${params.IMAGE_NAME}
+
+                    ssh -o StrictHostKeyChecking=no frqadmin@192.168.122.1 \
+                        'sudo mv /tmp/${params.IMAGE_NAME} /var/lib/libvirt/images/${params.IMAGE_NAME}'
+                """
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Golden image ${params.IMAGE_NAME} built successfully."
+        }
+        failure {
+            echo "Packer build failed. Check the console output for details."
+        }
+    }
+}

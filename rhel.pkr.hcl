@@ -7,6 +7,14 @@ packer {
   }
 }
 
+variable "kernel_url" {
+  type = string
+}
+
+variable "initrd_url" {
+  type = string
+}
+
 variable "kernel_params" {
   type = string
 }
@@ -36,18 +44,15 @@ source "qemu" "rhel" {
   output_directory = var.output_dir
   qemu_binary      = "/usr/libexec/qemu-kvm"
 
-  iso_url      = "file:///tmp/vmlinuz"
+  iso_url      = "file:///dev/null"
   iso_checksum = "none"
 
   qemuargs = [
     ["-cpu", "host"],
-    ["-kernel", "/tmp/vmlinuz"],
-    ["-initrd", "/tmp/initrd.img"],
-    # Keep inst.reboot=0 so Anaconda naturally hands control over to a safe reset
-    ["-append", "${var.kernel_params} console=ttyS0 inst.reboot=0"],
+    ["-kernel", var.kernel_url],
+    ["-initrd", var.initrd_url],
+    ["-append", "${var.kernel_params} console=ttyS0"],
     ["-serial", "stdio"],
-    # THE FIX: Tell QEMU to use direct kernel boot ONLY ONCE. 
-    # On the warm reboot triggered by Kickstart, it drops back to the hard drive ('c').
     ["-boot", "order=c,menu=off"]
   ]
 
@@ -59,10 +64,8 @@ source "qemu" "rhel" {
   memory   = 4096
   headless = true
 
-  machine_type      = "q35"
-  efi_boot          = false
-  # efi_firmware_code = "/usr/share/edk2/ovmf/OVMF_CODE.fd"
-  # efi_firmware_vars = "/usr/share/edk2/ovmf/OVMF_VARS.fd"
+  machine_type = "q35"
+  efi_boot     = false
 
   net_device   = "virtio-net"
   communicator = "ssh"
