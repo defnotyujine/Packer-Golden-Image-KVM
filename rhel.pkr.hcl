@@ -60,9 +60,9 @@ source "qemu" "rhel" {
   headless = true
 
   machine_type      = "q35"
-  efi_boot          = true
-  efi_firmware_code = "/usr/share/edk2/ovmf/OVMF_CODE.fd"
-  efi_firmware_vars = "/usr/share/edk2/ovmf/OVMF_VARS.fd"
+  efi_boot          = false
+  # efi_firmware_code = "/usr/share/edk2/ovmf/OVMF_CODE.fd"
+  # efi_firmware_vars = "/usr/share/edk2/ovmf/OVMF_VARS.fd"
 
   net_device   = "virtio-net"
   communicator = "ssh"
