@@ -43,7 +43,7 @@ source "qemu" "rhel" {
     ["-cpu", "host"],
     ["-kernel", "/tmp/vmlinuz"],
     ["-initrd", "/tmp/initrd.img"],
-    ["-append", "${var.kernel_params} console=ttyS0"],
+    ["-append", "${var.kernel_params} console=ttyS0 inst.reboot=0"],
     ["-serial", "stdio"]
   ]
 
@@ -66,7 +66,7 @@ source "qemu" "rhel" {
   ssh_password = var.ssh_password
   ssh_timeout  = "60m"
 
-  shutdown_command = "sudo systemctl poweroff"
+  shutdown_command = "sudo poweroff"
 }
 
 build {
