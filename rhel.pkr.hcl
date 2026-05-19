@@ -96,6 +96,24 @@ source "qemu" "rhel" {
 build {
   sources = ["source.qemu.rhel"]
 
+  provisioner "ansible" {
+    playbook_file = "${var.ansible_dir}/playbooks/main_playbook.yml"
+
+    extra_arguments = concat(
+      [
+        "--vault-password-file", var.vault_pass_file,
+        "--ssh-extra-args", "-o StrictHostKeyChecking=no -o IdentitiesOnly=yes"
+      ],
+      var.ansible_tags != "" ? ["--tags", var.ansible_tags] : []
+    )
+
+    ansible_env_vars = [
+      "ANSIBLE_ROLES_PATH=${var.ansible_dir}/playbooks/roles",
+      "ANSIBLE_SCP_IF_SSH=True",
+      "ANSIBLE_SSH_TRANSFER_METHOD=scp"
+    ]
+  }
+
   provisioner "shell" {
     inline = [
       "sudo rm -f /etc/machine-id",
@@ -104,19 +122,6 @@ build {
       "sudo rm -f /var/lib/NetworkManager/dhclient-*.lease",
       "sudo rm -f /etc/udev/rules.d/70-persistent-net.rules",
       "sudo cloud-init clean || true"
-    ]
-  }
-
-  provisioner "ansible" {
-    playbook_file = "${var.ansible_dir}/playbooks/main_playbook.yml"
-
-    extra_arguments = concat(
-      ["--vault-password-file", var.vault_pass_file],
-      var.ansible_tags != "" ? ["--tags", var.ansible_tags] : []
-    )
-
-    ansible_env_vars = [
-      "ANSIBLE_ROLES_PATH=${var.ansible_dir}/playbooks/roles"
     ]
   }
 
