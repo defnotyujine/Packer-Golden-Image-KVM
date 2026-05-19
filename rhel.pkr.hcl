@@ -39,6 +39,19 @@ variable "image_name" {
   default = "rhel-golden.qcow2"
 }
 
+variable "ansible_dir" {
+  type = string
+}
+
+variable "ansible_tags" {
+  type    = string
+  default = ""
+}
+
+variable "vault_pass_file" {
+  type = string
+}
+
 source "qemu" "rhel" {
   vm_name          = var.image_name
   output_directory = var.output_dir
@@ -87,6 +100,19 @@ build {
       "sudo rm -f /var/lib/NetworkManager/dhclient-*.lease",
       "sudo rm -f /etc/udev/rules.d/70-persistent-net.rules",
       "sudo cloud-init clean || true"
+    ]
+  }
+
+  provisioner "ansible" {
+    playbook_file = "${var.ansible_dir}/playbooks/main_playbook.yml"
+
+    extra_arguments = concat(
+      ["--vault-password-file", var.vault_pass_file],
+      var.ansible_tags != "" ? ["--tags", var.ansible_tags] : []
+    )
+
+    ansible_env_vars = [
+      "ANSIBLE_ROLES_PATH=${var.ansible_dir}/playbooks/roles"
     ]
   }
 
