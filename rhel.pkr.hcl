@@ -66,7 +66,7 @@ source "qemu" "rhel" {
 
   machine_type = "q35"
   efi_boot     = true
-  firmware     = "/usr/share/edk2/ovmf/OVMF_CODE.secboot.fd"
+  efi_fw_dir   = "/usr/share/edk2/ovmf"
 
   net_device   = "virtio-net"
   communicator = "ssh"
