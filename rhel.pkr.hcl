@@ -4,10 +4,6 @@ packer {
       source  = "github.com/hashicorp/qemu"
       version = ">= 1.0.0"
     }
-    ansible = {
-      source  = "github.com/hashicorp/ansible"
-      version = ">= 1.0.0"
-    }
   }
 }
 
@@ -41,19 +37,6 @@ variable "output_dir" {
 variable "image_name" {
   type    = string
   default = "rhel-golden.qcow2"
-}
-
-variable "ansible_dir" {
-  type = string
-}
-
-variable "ansible_tags" {
-  type    = string
-  default = ""
-}
-
-variable "vault_pass_file" {
-  type = string
 }
 
 source "qemu" "rhel" {
@@ -95,35 +78,6 @@ source "qemu" "rhel" {
 
 build {
   sources = ["source.qemu.rhel"]
-
-  provisioner "shell" {
-    inline = [
-      "sudo -u frqadmin mkdir -p /home/frqadmin/.ansible/tmp",
-      "sudo chmod 755 /home/frqadmin/.ansible/tmp",
-      "sudo chown -R frqadmin:frqadmin /home/frqadmin/.ansible"
-    ]
-  }
-
-  provisioner "ansible" {
-    playbook_file = "${var.ansible_dir}/playbooks/main_playbook.yml"
-    sftp_command  = "/usr/libexec/openssh/sftp-server -e"
-    user          = var.ssh_username
-
-    extra_arguments = concat(
-      [
-        "--vault-password-file", var.vault_pass_file,
-        "--ssh-extra-args", "-o StrictHostKeyChecking=no -o IdentitiesOnly=yes"
-      ],
-      var.ansible_tags != "" ? ["--tags", var.ansible_tags] : []
-    )
-
-    ansible_env_vars = [
-      "ANSIBLE_ROLES_PATH=${var.ansible_dir}/playbooks/roles",
-      "ANSIBLE_SCP_IF_SSH=True",
-      "ANSIBLE_SSH_TRANSFER_METHOD=scp",
-      "ANSIBLE_REMOTE_TMP=/home/frqadmin/.ansible/tmp"
-    ]
-  }
 
   provisioner "shell" {
     inline = [
