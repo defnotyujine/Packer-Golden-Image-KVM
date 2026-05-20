@@ -113,7 +113,7 @@ build {
       "ANSIBLE_ROLES_PATH=${var.ansible_dir}/playbooks/roles",
       "ANSIBLE_SCP_IF_SSH=True",
       "ANSIBLE_SSH_TRANSFER_METHOD=scp",
-      "ANSIBLE_REMOTE_TMP=/tmp/.ansible/tmp"
+      "ANSIBLE_REMOTE_TMP=/home/frqadmin/.ansible/tmp"
     ]
   }
 
