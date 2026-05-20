@@ -33,6 +33,24 @@ pipeline {
             }
         }
 
+        stage('Checkout Packer Repo') {
+            steps {
+                dir('packer') {
+                    git branch: 'devel',
+                        url: 'https://github.com/defnotyujine/Packer-Golden-Image-KVM.git'
+                }
+            }
+        }
+
+        stage('Checkout Ansible Repo') {
+            steps {
+                dir('ansible') {
+                    git branch: 'devel',
+                        url: 'https://github.com/defnotyujine/Jenkins-CIS-Hardening-Pipeline.git'
+                }
+            }
+        }
+
         stage('Terraform Cleanup') {
             when {
                 expression { params.CLEAN_START }
@@ -50,22 +68,13 @@ pipeline {
 
         stage('Install Collections') {
             steps {
-                sh 'ansible-galaxy collection install -r requirements.yml'
+                sh 'ansible-galaxy collection install -r ansible/requirements.yml'
             }
         }
 
         stage('Install Roles') {
             steps {
-                sh 'ansible-galaxy role install -r requirements.yml -p playbooks/roles/ --force'
-            }
-        }
-
-        stage('Checkout Packer Repo') {
-            steps {
-                dir('packer') {
-                    git branch: 'devel',
-                        url: 'https://github.com/defnotyujine/Packer-Golden-Image-KVM.git'
-                }
+                sh 'ansible-galaxy role install -r ansible/requirements.yml -p ansible/playbooks/roles/ --force'
             }
         }
 
@@ -157,7 +166,7 @@ pipeline {
                     for (int i = 0; i < ipList.size(); i++) {
                         hosts += "    ${ip.trim()}:\n      ansible_host: ${ipList[i].trim()}\n"
                     }
-                    writeFile file: 'sysconfig/inventory.yml', text: "all:\n  hosts:\n${hosts}"
+                    writeFile file: 'ansible/sysconfig/inventory.yml', text: "all:\n  hosts:\n${hosts}"
                 }
             }
         }
@@ -177,8 +186,8 @@ pipeline {
                         }
                         sh 'echo $VAULT_PASS > /tmp/vault_pass.txt'
                         ansiblePlaybook(
-                            playbook: 'playbooks/main_playbook.yml',
-                            inventory: 'sysconfig/inventory.yml',
+                            playbook: 'ansible/playbooks/main_playbook.yml',
+                            inventory: 'ansible/sysconfig/inventory.yml',
                             extras: extraArgs
                         )
                     }
