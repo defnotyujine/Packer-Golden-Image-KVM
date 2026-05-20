@@ -98,7 +98,8 @@ build {
 
   provisioner "shell" {
     inline = [
-      "sudo mkdir -p /home/frqadmin/.ansible/tmp",
+      "sudo -u frqadmin mkdir -p /home/frqadmin/.ansible/tmp",
+      "sudo chmod 755 /home/frqadmin/.ansible/tmp",
       "sudo chown -R frqadmin:frqadmin /home/frqadmin/.ansible"
     ]
   }
