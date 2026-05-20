@@ -96,6 +96,13 @@ source "qemu" "rhel" {
 build {
   sources = ["source.qemu.rhel"]
 
+  provisioner "shell" {
+    inline = [
+      "sudo mkdir -p /home/frqadmin/.ansible/tmp",
+      "sudo chown -R frqadmin:frqadmin /home/frqadmin/.ansible"
+    ]
+  }
+
   provisioner "ansible" {
     playbook_file = "${var.ansible_dir}/playbooks/main_playbook.yml"
     sftp_command  = "/usr/libexec/openssh/sftp-server -e"
