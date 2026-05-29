@@ -135,9 +135,17 @@ pipeline {
         stage('Upload Image') {
             steps {
                 sh '''
+                    KVM_HOST="frqadmin@192.168.122.1"
+
+                    ssh -o StrictHostKeyChecking=no "$KVM_HOST" \
+                        "rm -f /mnt/kvm_storage1/${IMAGE_NAME}"
+
                     scp -o StrictHostKeyChecking=no \
                         /var/lib/jenkins/packer-output/${IMAGE_NAME} \
-                        frqadmin@192.168.122.1:/mnt/kvm_storage1/
+                        "${KVM_HOST}:/mnt/kvm_storage1/"
+
+                    ssh -o StrictHostKeyChecking=no "$KVM_HOST" \
+                        "virsh pool-refresh kvmDatastore_qcow2_1"
                 '''
             }
         }
