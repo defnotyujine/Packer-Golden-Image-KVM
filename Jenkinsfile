@@ -159,7 +159,8 @@ pipeline {
                     terraform init
                     terraform apply -auto-approve \
                         -var="vm_count=${params.VM_COUNT}" \
-                        -var="golden_image_name=${env.IMAGE_FILENAME}"
+                        -var="golden_image_name=${env.IMAGE_FILENAME}" \
+                        -var="vm_name=${params.IMAGE_NAME}"
                 """
             }
         }
@@ -191,7 +192,7 @@ pipeline {
                     )
                 ]) {
                     script {
-                        def extraArgs = "--vault-password-file /tmp/vault_pass.txt"
+                        def extraArgs = "--vault-password-file /tmp/vault_pass.txt --ssh-extra-args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'"
                         if (params.TAGS) {
                             extraArgs += " --tags \"${params.TAGS}\""
                         }
