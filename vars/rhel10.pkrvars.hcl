@@ -1,1 +1,0 @@
-image_name = "rhel10-golden.qcow2"
