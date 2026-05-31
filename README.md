@@ -1,4 +1,4 @@
-# Packer-Golden-Image-KVM# Packer RHEL Golden Image Builder
+# Packer-Golden-Image-KVM Packer RHEL Golden Image Builder
 
 Builds a RHEL golden image from a Kickstart meta JSON file.
 
